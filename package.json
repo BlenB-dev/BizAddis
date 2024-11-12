@@ -1,0 +1,28 @@
+{
+  "name": "biz-connect",
+  "version": "1.0.0",
+  "description": "Biz-Connect Addis\r The city's dynamic environment, coupled with a growing pool of young, innovative minds, has led to an increase in the number of startups. However, despite this burgeoning entrepreneurial spirit, many startups face significant challenges in accessing necessary services and securin",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "backend": "concurrently -k \"npm run serverNode\" \"npm run serverPython\"",
+    "serverNode": "cd Backend/Nodejs && npm run dev",
+    "serverPython": "cd Backend/Python && venv\\\\Scripts\\\\flask run --reload -p 8080",
+    "client": "cd Biz-connect && npm run dev",
+    "dev": "concurrently -k \"npm run backend\" \"npm run client\""
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@headlessui/react": "^2.1.5",
+    "@heroicons/react": "^2.1.5",
+    "@mui/icons-material": "^6.1.3",
+    "@mui/material": "^6.1.3",
+    "concurrently": "^8.2.2",
+    "file-saver": "^2.0.5",
+    "react-hook-form": "^7.53.0",
+    "react-scroll": "^1.9.0"
+  }
+}

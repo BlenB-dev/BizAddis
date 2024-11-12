@@ -1,0 +1,82 @@
+/* ResponsiveStyle.css */
+
+/* Base footer styles */
+.footer {
+  background-color: #000000; /* gray-900 */
+  color: white;
+  width: 100%; /* Default to full width */
+  box-sizing: border-box; /* Include padding and borders in width */
+}
+
+/* Responsive styles */
+@media (max-width: 480px) {
+  /* iPhone SE */
+  .footer {
+    padding: 10px 0;
+    margin-top: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* iPad */
+  .footer {
+    height: 330px;
+    padding-left: 10px; /* Use padding instead of margin */
+    padding-right: 10px;
+  }
+}
+
+@media (min-width: 820px) {
+  .footer {
+    height: 340px;
+    padding-left: 20px; /* Use padding instead */
+    padding-right: 20px;
+  }
+}
+
+@media (max-width: 411px) {
+  /* Galaxy S8 */
+  .footer {
+    padding: 15px 0;
+    height: 450px;
+  }
+}
+@media (max-width: 414px) {
+  /* Iphone XR*/
+  .footer {
+    height: 430px;
+  }
+}
+
+@media (min-width: 600px) and (max-width: 900px) {
+  /* Surface Duo */
+  .footer {
+    padding: 20px 0;
+    margin-top: 200px;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1200px) {
+  /* Nest Hub */
+  .footer {
+    margin-top: 270px;
+    padding-left: 60px;
+    padding-right: 60px;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 1201px) {
+  /* Desktop */
+  .footer {
+    height: 330px;
+    margin-left: -90px; /* Centering */
+    width: 1400px; /* Adjust as needed */
+  }
+}
+@media (min-width: 430px) {
+  .footer {
+    height: 340px;
+  }
+}
