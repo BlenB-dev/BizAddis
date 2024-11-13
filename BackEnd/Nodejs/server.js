@@ -22,16 +22,22 @@ const db = new Pool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
+  port: process.env.DB_PORT || 5432,
+  ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false,
 });
-
+db.connect((err) => {
+  if (err) {
+    console.error("Failed to connect to PostgreSQL:", err.message);
+  } else {
+    console.log("Connected to PostgreSQL database.");
+  }
+});
 const GetServiceProviderRecommendationsForStartups = async (StartupUserID) => {
   try {
     let Recommended = [];
     const queryGetAllServiceProviders =
       "SELECT ServiceProviderID FROM ServiceProviders ";
-    const [allServiceProviders] = await db
-      .promise()
-      .query(queryGetAllServiceProviders);
+    const [allServiceProviders] = await db.query(queryGetAllServiceProviders);
 
     if (allServiceProviders.length === 0) {
       console.log("No Service Providers");
@@ -42,7 +48,7 @@ const GetServiceProviderRecommendationsForStartups = async (StartupUserID) => {
     );
 
     const query = "SELECT StartupID FROM Startups WHERE UserID = ?";
-    const [startupResult] = await db.promise().query(query, [StartupUserID]);
+    const [startupResult] = await db.query(query, [StartupUserID]);
     if (startupResult.length === 0) {
       console.log("No Such Startup Error");
       return;
@@ -52,9 +58,10 @@ const GetServiceProviderRecommendationsForStartups = async (StartupUserID) => {
 
     const queryStartupVisitHistory =
       "SELECT ServiceProviderID FROM StartupVisitHistory WHERE StartupID = ?";
-    const [startupVisitHistoryResult] = await db
-      .promise()
-      .query(queryStartupVisitHistory, [StartupID]);
+    const [startupVisitHistoryResult] = await db.query(
+      queryStartupVisitHistory,
+      [StartupID]
+    );
     if (startupVisitHistoryResult.length === 0) {
       console.log("Empty Startup History");
       for (
@@ -77,9 +84,10 @@ const GetServiceProviderRecommendationsForStartups = async (StartupUserID) => {
     WHERE ServiceProviderID IN (?)
     AND StartupID != ?
     `;
-    const [similarSearchStartupsResults] = await db
-      .promise()
-      .query(querySimilarSearchStartups, [startupVisitHistory, StartupID]);
+    const [similarSearchStartupsResults] = await db.query(
+      querySimilarSearchStartups,
+      [startupVisitHistory, StartupID]
+    );
     if (similarSearchStartupsResults.length === 0) {
       console.log("No Similar Search Startups");
       for (
@@ -105,12 +113,10 @@ const GetServiceProviderRecommendationsForStartups = async (StartupUserID) => {
       ORDER BY occurrence_count DESC;
       `;
 
-    const [similarSearchServiceProviderResults] = await db
-      .promise()
-      .query(querySimilarSearchServiceProvider, [
-        similarSearchStartups,
-        StartupID,
-      ]);
+    const [similarSearchServiceProviderResults] = await db.query(
+      querySimilarSearchServiceProvider,
+      [similarSearchStartups, StartupID]
+    );
     if (similarSearchServiceProviderResults.length === 0) {
       console.log("No Similar Search ServiceProviders");
       for (
@@ -161,7 +167,7 @@ const GetServiceProviderRecommendationsForStartups = async (StartupUserID) => {
 const GetStartupRecommendationForInvestors = async (InvestorUserID) => {
   try {
     const query = "SELECT InvestorID FROM Investors WHERE UserID = ?";
-    const [investorResult] = await db.promise().query(query, [InvestorUserID]);
+    const [investorResult] = await db.query(query, [InvestorUserID]);
 
     if (investorResult.length === 0) {
       console.log("No Such Investor Error");
@@ -173,9 +179,7 @@ const GetStartupRecommendationForInvestors = async (InvestorUserID) => {
 
     const preferencesQuery =
       "SELECT InvestorPreference FROM Investors WHERE InvestorID = ?";
-    const [preferencesResult] = await db
-      .promise()
-      .query(preferencesQuery, [InvestorID]);
+    const [preferencesResult] = await db.query(preferencesQuery, [InvestorID]);
 
     if (preferencesResult.length === 0) {
       console.log("No Investor Preferences");
@@ -194,9 +198,7 @@ const GetStartupRecommendationForInvestors = async (InvestorUserID) => {
         WHERE InvestorID = ?
       );
     `;
-    const [startupsResult] = await db
-      .promise()
-      .query(startupsQuery, [InvestorID]);
+    const [startupsResult] = await db.query(startupsQuery, [InvestorID]);
 
     if (startupsResult.length === 0) {
       console.log("No Such Startups");
@@ -214,9 +216,9 @@ const GetStartupRecommendationForInvestors = async (InvestorUserID) => {
       FROM investorstartupconnection
       WHERE InvestorID = ?;
     `;
-    const [connectionStatsResult] = await db
-      .promise()
-      .query(connectionStatsQuery, [InvestorID]);
+    const [connectionStatsResult] = await db.query(connectionStatsQuery, [
+      InvestorID,
+    ]);
 
     const AcceptCount = connectionStatsResult[0].AcceptCount;
     const DeclineCount = connectionStatsResult[0].DeclineCount;
@@ -269,9 +271,9 @@ const GetStartupRecommendationForInvestors = async (InvestorUserID) => {
           AND InvestorID = ?
         );
       `;
-      const [connectedStartupsResult] = await db
-        .promise()
-        .query(connectedStartupsQuery, [InvestorID]);
+      const [connectedStartupsResult] = await db.query(connectedStartupsQuery, [
+        InvestorID,
+      ]);
 
       if (connectedStartupsResult.length === 0) {
         console.log("No Connected Startups");
@@ -291,9 +293,9 @@ const GetStartupRecommendationForInvestors = async (InvestorUserID) => {
         AND InvestorID = ?
       );
     `;
-      const [acceptedStartupsResult] = await db
-        .promise()
-        .query(acceptedStartupsQuery, [InvestorID]);
+      const [acceptedStartupsResult] = await db.query(acceptedStartupsQuery, [
+        InvestorID,
+      ]);
 
       if (acceptedStartupsResult.length === 0) {
         console.log("No Accepted Startups");
@@ -313,9 +315,9 @@ const GetStartupRecommendationForInvestors = async (InvestorUserID) => {
       AND InvestorID = ?
     );
   `;
-      const [declinedStartupsResult] = await db
-        .promise()
-        .query(declinedStartupsQuery, [InvestorID]);
+      const [declinedStartupsResult] = await db.query(declinedStartupsQuery, [
+        InvestorID,
+      ]);
 
       if (acceptedStartupsResult.length === 0) {
         console.log("No Declined Startups");
@@ -335,9 +337,9 @@ const GetStartupRecommendationForInvestors = async (InvestorUserID) => {
     AND InvestorID = ?
   );
 `;
-      const [ignoredStartupsResult] = await db
-        .promise()
-        .query(ignoredStartupsQuery, [InvestorID]);
+      const [ignoredStartupsResult] = await db.query(ignoredStartupsQuery, [
+        InvestorID,
+      ]);
 
       if (ignoredStartupsResult.length === 0) {
         console.log("No Ignored Startups");
@@ -1437,7 +1439,7 @@ app.post("/api/AdminDeleteInvestor", authenticateJWT, async (req, res) => {
   const { InvestorID } = req.body;
 
   const query = "SELECT UserID FROM Investors WHERE InvestorID = ?";
-  const [InvestorUserIDResult] = await db.promise().query(query, [InvestorID]);
+  const [InvestorUserIDResult] = await db.query(query, [InvestorID]);
   if (InvestorUserIDResult.length === 0) {
     console.log("No Such Startup Error");
     return;
@@ -1465,7 +1467,7 @@ app.post("/api/AdminDeleteStartup", authenticateJWT, async (req, res) => {
   const { StartupID } = req.body;
 
   const query = "SELECT UserID FROM Startups WHERE StartupID = ?";
-  const [StartupUserIDResult] = await db.promise().query(query, [StartupID]);
+  const [StartupUserIDResult] = await db.query(query, [StartupID]);
   if (StartupUserIDResult.length === 0) {
     console.log("No Such Startup Error");
     return;
@@ -1497,9 +1499,9 @@ app.post(
 
     const query =
       "SELECT UserID FROM ServiceProviders WHERE ServiceProviderID = ?";
-    const [ServiceProviderUserIDResult] = await db
-      .promise()
-      .query(query, [ServiceProviderID]);
+    const [ServiceProviderUserIDResult] = await db.query(query, [
+      ServiceProviderID,
+    ]);
     if (ServiceProviderUserIDResult.length === 0) {
       console.log("No Such Startup Error");
       return;
