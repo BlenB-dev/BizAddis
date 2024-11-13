@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "backend": "concurrently -k \"npm run serverNode\" \"npm run serverPython\"",
     "serverNode": "cd Backend/Nodejs && npm run dev",
-    "serverPython": "cd Backend/Python && venv\\\\Scripts\\\\flask run --reload -p 8080",
+    "serverPython": "cd Backend/Python && venv\\Scripts\\flask run --reload -p 8080",
     "client": "cd Biz-connect && npm run dev",
     "dev": "concurrently -k \"npm run backend\" \"npm run client\""
   },
